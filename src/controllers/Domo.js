@@ -26,7 +26,7 @@ var makeDomo = function(req, res){
 		owner: req.session.account._id
 	};
 	
-	var newDomo = new Domo.DOmoModel(domoData);
+	var newDomo = new Domo.DomoModel(domoData);
 	
 	newDomo.save(function(err){
 		if(err){
