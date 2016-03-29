@@ -20,28 +20,19 @@ var login = function(req, res)
 {
 	if(!req.body.username || !req.body.pass)
 	{
-		return res.status(400).json(
-		{
-			error: "RAWR! All fields are required"
-		});
+		return res.status(400).json({error: "RAWR! All fields are required"});
 	}
 	
 	Account.AccountModel.authenticate(req.body.username, req.body.pass, function(err, account)
 	{
 		if(err || !account)
 		{
-			return res.status(401).json(
-			{
-				error: "Wrong username or password"
-			});
+			return res.status(401).json({error: "Wrong username or password"});
 		}
 		
 		req.session.account = account.toAPI();
 		
-		res.json(
-		{
-			redirect: "/maker"
-		});
+		res.json({redirect: "/maker"});
 	});
 };
 
@@ -49,18 +40,12 @@ var signup = function(req, res)
 {
 	if(!req.body.username || !req.body.pass || !req.body.pass2)
 	{
-		return res.status(400).json(
-		{
-			error: "RAWR! All fields are required"
-		});
+		return res.status(400).json({error: "RAWR! All fields are required"});
 	}
 	
 	if(req.body.pass !== req.body.pass2)
 	{
-		return res.status(400).json(
-		{
-			error: "RAWR! Passwords do not match"
-		});
+		return res.status(400).json({error: "RAWR! Passwords do not match"});
 	}
 	
 	Account.AccountModel.generateHash(req.body.pass, function(salt, hash)
@@ -79,18 +64,12 @@ var signup = function(req, res)
 			if(err)
 			{
 				console.log(err);
-				return res.status(400).json(
-				{
-					error: "An error occurred"
-				});
+				return res.status(400).json({error: "An error occurred"});
 			}
 			
 			req.session.account = newAccount.toAPI();
 			
-			res.json(
-			{
-				redirect: "/maker"
-			});
+			res.json({redirect: "/maker"});
 		});
 	});
 };

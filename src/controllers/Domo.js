@@ -8,16 +8,10 @@ var makerPage = function(req, res)
 		if(err)
 		{
 			console.log(err);
-			return res.status(400).json(
-			{
-				error: "An error occured"
-			});
+			return res.status(400).json({error: "An error occured"});
 		}
 		
-		res.render("app", 
-		{
-			domos: docs
-		});
+		res.render("app", {domos: docs});
 	});
 };
 
@@ -25,10 +19,7 @@ var makeDomo = function(req, res)
 {
 	if(!req.body.name || !req.body.age)
 	{
-		return res.status(400).json(
-		{
-			error: "RAWR! Both name and age are required"
-		});
+		return res.status(400).json({error: "RAWR! Both name and age are required"});
 	}
 	
 	var domoData = 
@@ -45,16 +36,10 @@ var makeDomo = function(req, res)
 		if(err)
 		{
 			console.log(err);
-			return res.status(400).json(
-			{
-				error: "An error occured"
-			});
+			return res.status(400).json({error: "An error occured"});
 		}
 		
-		res.json(
-		{
-			redirect: "/maker"
-		});
+		res.json({redirect: "/maker"});
 	});
 };
 
