@@ -1,81 +1,58 @@
-var models = require("../models");
-var Account = models.Account;
-var loginPage = function(req, res)
-{
-	res.render("login");
-};
+var mongoose = require("mongoose");
+var _ = require("underscore");
+var DomoModel;
+var setName = function(name){return _.escape(name).trim();};
 
-var signupPage = function(req, res)
+var DomoSchema = new mongoose.Schema(
 {
-	res.render("signup");
-};
-
-var logout = function(req, res)
-{
-	req.session.destroy();
-	res.redirect("/");
-};
-
-var login = function(req, res)
-{
-	if(!req.body.username || !req.body.pass)
+	name: 
 	{
-		return res.status(400).json({error: "RAWR! All fields are required"});
-	}
+		type: String,
+		required: true,
+		trim: true,
+		set: setName
+	},
 	
-	Account.AccountModel.authenticate(req.body.username, req.body.pass, function(err, account)
+	age: 
 	{
-		if(err || !account)
-		{
-			return res.status(401).json({error: "Wrong username or password"});
-		}
-		
-		req.session.account = account.toAPI();
-		
-		res.json({redirect: "/maker"});
-	});
-};
+		type: Number,
+		min: 0,
+		required: true
+	},
+	
+	owner:
+	{
+		type: mongoose.Schema.ObjectId,
+		required: true,
+		ref: "Account"
+	},
+	
+	createdData:
+	{
+		type: Date,
+		default: Date.now
+	}
+});
 
-var signup = function(req, res)
+DomoSchema.methods.toAPI = function()
 {
-	if(!req.body.username || !req.body.pass || !req.body.pass2)
-	{
-		return res.status(400).json({error: "RAWR! All fields are required"});
-	}
-	
-	if(req.body.pass !== req.body.pass2)
-	{
-		return res.status(400).json({error: "RAWR! Passwords do not match"});
-	}
-	
-	Account.AccountModel.generateHash(req.body.pass, function(salt, hash)
-	{
-		var accountData = 
-		{
-			username: req.body.username,
-			salt: salt,
-			password: hash
-		};
-		
-		var newAccount = new Account.AccountModel(accountData);
-		
-		newAccount.save(function(err)
-		{
-			if(err)
-			{
-				console.log(err);
-				return res.status(400).json({error: "An error occurred"});
-			}
-			
-			req.session.account = newAccount.toAPI();
-			
-			res.json({redirect: "/maker"});
-		});
-	});
+	return {
+		name: this.name,
+		age: this.age
+	};
 };
 
-module.exports.loginPage = loginPage;
-module.exports.login = login;
-module.exports.logout = logout;
-module.exports.signupPage = signupPage;
-module.exports.signup = signup;
+DomoSchema.statics.findByOwner = function(ownerId, callback)
+{
+	var search = 
+	{
+		owner: mongoose.Types.ObjectId(ownerId)
+	};
+	
+	return DomoModel.find(search).select("name age").exec(callback);
+};
+
+DomoModel = mongoose.model("Domo", DomoSchema);
+
+module.exports.DomoModel = DomoModel;
+module.exports.DomoSchema = DomoSchema;
